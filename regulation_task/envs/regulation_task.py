@@ -151,7 +151,7 @@ class RegulationTask(Env):
                 pg.draw.circle(screen,(200,0,0), w_circle_pos, wcirc_sz)
                 # flow indicator
                 f_ind = self.f_list[t] * 40
-                end_p = (middle_w-f_ind, middle_h)
+                end_p = (middle_w+f_ind, middle_h)
                 pg.draw.line(screen, red, anchor, end_p, 5)
                 sleep(0.05)
                 pg.display.flip()   
