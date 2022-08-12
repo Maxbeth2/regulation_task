@@ -5,8 +5,8 @@ from gym.spaces.box import Box
 
 import pygame as pg
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from regulation_task.envs.bodySimpleMode import BodySimpleMode as Body
 from regulation_task.envs.nutrientStream import NutrientStream
@@ -116,6 +116,8 @@ class RegulationTask(Env):
             plt.savefig(fname=plotname, format='png')
             plt.close()
     
+
+    
     def pygame_render(self):
         render = input("Show animation? Y/N: ")
         if render == 'Y' or render == 'y':
@@ -134,7 +136,13 @@ class RegulationTask(Env):
             e_circle_pos = (middle_w + 100, middle_h)
             w_circle_pos = (middle_w - 100, middle_h)
             body = pg.Rect(body_pos[0], body_pos[1], bodysize, bodysize)
-
+            mouth_closed_left_center = middle_w-20
+            mouth_closed_right_center = middle_w+20
+            mouth_height = middle_h - half_bs
+            mouth_open = middle_w
+            
+            
+            
             # ANIMATION LOOP
             for t in range(len(self.e_list)):
                 bgc.g = int(self.n_list[t] * 8)
@@ -144,18 +152,30 @@ class RegulationTask(Env):
                 wcirc_sz = self.w_list[t] / 2
                 p_color = self.pw_list[t] * 255
                 #Body
-                pg.draw.rect(screen, (200,200,200), body)
-                # digestor
+                pg.draw.rect(screen, (100,100,100), body)
+                pg.draw.rect(screen, (200,200,200), body, width=15)
                 pg.draw.circle(screen,(p_color,200,0), e_circle_pos, ecirc_sz)
+                # digestor
                 # waste department
                 pg.draw.circle(screen,(200,0,0), w_circle_pos, wcirc_sz)
                 # flow indicator
                 f_ind = self.f_list[t] * 40
                 end_p = (middle_w+f_ind, middle_h)
                 pg.draw.line(screen, red, anchor, end_p, 5)
+                # open/close mouth
+                if self.i_list[t] > 0.5:
+                    left_mouth = pg.Rect(mouth_closed_left_center, mouth_height, 15, 30)
+                    right_mouth = pg.Rect(mouth_closed_right_center,mouth_height, 15, 30)
+                else:
+                    left_mouth = pg.Rect(mouth_open, mouth_height, 15, 30)
+                    right_mouth = pg.Rect(mouth_open,mouth_height, 15, 30)
+
+                pg.draw.rect(screen, (255,100,100), left_mouth)
+                pg.draw.rect(screen, (255,100,100), right_mouth)
+
                 sleep(0.05)
-                pg.display.flip()   
-            
+                pg.display.flip()
+                                         
             pg.display.flip()
             screen.fill(black)
             pg.display.flip()
