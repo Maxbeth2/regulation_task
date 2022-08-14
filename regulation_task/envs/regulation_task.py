@@ -1,5 +1,3 @@
-from cmath import e
-
 from time import sleep
 from gym import Env
 from gym.spaces.box import Box
