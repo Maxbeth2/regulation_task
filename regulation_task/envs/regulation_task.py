@@ -1,4 +1,5 @@
 from cmath import e
+
 from time import sleep
 from gym import Env
 from gym.spaces.box import Box
@@ -94,9 +95,13 @@ class RegulationTask(Env):
         self.pw_list = []
 
     def end_data_collection(self):  # --------------||
+        # save run as numpy array
         self.collecting = False
-        self.mk_plots()
-        self.pygame_render()
+        self.quickplot()
+        skip = self.save_run()
+        if not skip:
+            #self.mk_plots()
+            self.pygame_render()
         
     def mk_plots(self):
 
@@ -115,8 +120,23 @@ class RegulationTask(Env):
             plt.legend()
             plt.savefig(fname=plotname, format='png')
             plt.close()
-    
 
+    def quickplot(self):
+        t = range(len(self.e_list))
+        a = plt.subplot(211)
+        plt.plot(t, self.e_list, label="Energy")
+        plt.plot(t, self.w_list, label="Waste")
+        plt.plot(t, self.n_list, label="Nutritional value")
+        plt.legend()
+        b = plt.subplot(212)
+        plt.plot(t, self.f_list, label="Flow")
+        plt.plot(t, self.i_list, label="Mouth open/closed")
+        plt.plot(t, self.pw_list, label="Waste penalty")
+        plt.legend()
+        print("\nYou will now get options to save and visualize the episode. close the figure to get options.\n")
+        plt.show(block=True)
+        plt.close()
+    
     
     def pygame_render(self):
         render = input("Show animation? Y/N: ")
@@ -181,3 +201,19 @@ class RegulationTask(Env):
             pg.display.flip()
 
 
+    def save_run(self):
+        choice = input("Options:\n-press ENTER to discard\n-enter desired filename to save data\n-add ', -v' to immediately plot and visualise: ")
+        skip = True
+        if ',' in choice:
+            choice = choice.split(',')[0].strip()
+            skip = False
+
+        if choice != 'skip':
+            data = np.array( [self.e_list, self.w_list, self.f_list, self.i_list, self.pw_list] )
+            choice = "lifecycles_data/" + choice
+            np.save(choice, data, True)
+
+        if choice == '':
+            skip = True
+
+        return skip
