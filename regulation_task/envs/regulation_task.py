@@ -97,7 +97,9 @@ class RegulationTask(Env):
     def end_data_collection(self):  # --------------||
         # save run as numpy array
         self.collecting = False
-        self.quickplot()
+        p = input("show plot? y/n: ")
+        if p == 'y' or p == 'Y':
+            self.quickplot()
         skip = self.save_run()
         if not skip:
             #self.mk_plots()
@@ -208,7 +210,7 @@ class RegulationTask(Env):
             choice = choice.split(',')[0].strip()
             skip = False
 
-        if choice != 'skip':
+        if choice != '':
             data = np.array( [self.e_list, self.w_list, self.f_list, self.i_list, self.pw_list] )
             choice = "lifecycles_data/" + choice
             np.save(choice, data, True)
