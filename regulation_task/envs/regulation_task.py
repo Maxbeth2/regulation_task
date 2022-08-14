@@ -80,7 +80,7 @@ class RegulationTask(Env):
             self.end_data_collection() # --------------||
         self.body.reset()
         self.alive = True
-        obs = self.body.time_step(self.action_space.sample())
+        obs = self.body.get_obs()
         return obs
 
     def start_data_colection(self):  # --------------||
