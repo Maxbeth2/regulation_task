@@ -1,4 +1,3 @@
-
 from regulation_task.envs.util_funcs.funcs import sigmoid_thr
 import numpy as np
 # compartmentalisation enables isolation of chemical reactions
@@ -82,12 +81,8 @@ class BodySimpleMode():
         next_food = self.food_stream.time_step()
         self.N = next_food
 
-        # process sensory inputs for observation space
-        next_E = next_food[0]
-        next_W = next_food[1]
-        sys_vars = np.array([self.E, self.W, next_E, next_W, self.f, self.i], dtype='float32')
-        obs = (self.i, sys_vars)
-        #print(f"\n-----\nSYS_VARS: {sys_vars}\n-----\n")
+        # get observation to act on in next time step
+        sys_vars = self.get_obs(next_food)
         return sys_vars
 
 
@@ -119,6 +114,18 @@ class BodySimpleMode():
         self.f = 0
         self.i = False
         self.food_stream.t = 0
+
+
+    def get_obs(self, next_food=None):
+        """ returns a np array containing the observation of the current state"""
+        if next_food != None:
+            next_E = next_food[0]
+            next_W = next_food[1]
+        else:
+            next_E = 0
+            next_W = 0
+
+        return np.array([self.E, self.W, next_E, next_W, self.f, self.i], dtype='float32')
 
 
     def info(self):
