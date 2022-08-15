@@ -35,7 +35,7 @@ class RegulationTask(Env):
             self.alive = False
         info={}
         if self.alive == True:
-            reward = 1
+            reward = self.body.E
             done = False
         else:
             reward = 0
@@ -102,7 +102,8 @@ class RegulationTask(Env):
         if not skip:
             #self.mk_plots()
             self.pygame_render()
-        
+
+
     def mk_plots(self):
 
         plotname = input("Plotting... write plot filename + .png or press ENTER to skip: ")
@@ -120,6 +121,7 @@ class RegulationTask(Env):
             plt.legend()
             plt.savefig(fname=plotname, format='png')
             plt.close()
+
 
     def quickplot(self):
         t = range(len(self.e_list))
@@ -217,3 +219,4 @@ class RegulationTask(Env):
             skip = True
 
         return skip
+

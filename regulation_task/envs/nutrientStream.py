@@ -21,13 +21,13 @@ class NutrientStream():
     
     def time_step(self):
         self.t += self.dt
-        noise_amplitude = 2
+        noise_amplitude = 0
         noise = randint(-2,noise_amplitude)
-        amplitude = 9
-        offset = 8
-        self.val = max(amplitude * sin(self.t) + offset + noise, 0)
-        waste_val = 5
+        amplitude = 8
+        offset = 7
+        self.val = max(amplitude * sin(self.t) + offset, 0)
+        waste_val = max(4 * sin(self.t+0.5) + 3, 0)
         
-        return (self.val, waste_val)
+        return (self.val, 4.8)
         
     
