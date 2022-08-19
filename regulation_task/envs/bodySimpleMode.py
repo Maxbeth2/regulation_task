@@ -7,26 +7,34 @@ import numpy as np
 # The isolation of chemical reaction is not explicitly modeled here,
 # but resource flows are modeled.
 class BodySimpleMode():
-    """
-    Object that manages interactions between compartments 
-    as well as compartments and environment.\n
-    Attributes:\n
-    d  | number of digestive compartments = max amt of nutrients that can be simultaneously drawn from N, dtype=int\n
-    c  | number of cleaning compartments = max amt of toxins that can be cleared from system in one step\n
-    bm | basal metabolism\nj
-
+    """### A body needs nutrients to keep going, and it needs to rid the system of excess waste products in order to function properly.\n
+    State of operation:\n
+    * The body can choose whether or not to be permeable to its surroundings by opening or closing its "mouth" - bool ( i ).\n
+    * If the mouth is open, a "token" of nutrients tuple ( E_nt, W_nt ) arrive into the system.\n
+    * The body then processes these nutrients, resulting in the addition of both energy float ( E ) (which keeps the body operational)
+    and waste float ( W ), that the body must get rid of.
+    * How much E and W are added to the system upon consumption of nutrients depends on several things:
+    \n\t\t* How much Energy and Waste the nutrient token contains
+    \n\t\t* How much waste is already in the system ( 'waste penalty' / Pw ) 0 < Pw < 1; The energy gained from processing a nutrient is multiplied by Pw
+    \n\t\t* A regulatoy variable 'f' (stands for flow, or focus if you like) which represents how the body regulates itself and directs its energy.
+    \n\t\t\t* -0.5 < f < 0.5. 
+    \n\t\t\t* The greater f is, the more resources are directed towards extracting enegy from the incoming nutrients
+    \n\t\t\t* The smaller f is, the more resources are directed towards excreting waste from the system
+    \n * The body processes the nutrient, adds/substracts the correct amounts of E and W to/from the system.
+    \n * The process repeats, with new nutrients arriving and the agent deciding whether to consume them and how to process them while maintaining its system variables (E and W)
+    \n * The gym env checks the body's E variable and sets done = True if it goes under a threshold (1)
     """
     def __init__(self, compartments=["w_comp","e_comp"], food_stream=None):
 
        # SETUP ->
        
-       # list of compartments within system
+       # list of compartments within system - overcomplicated way of specifying that the system can extract energy and excrete waste
         self.compartments = compartments
         self.n_comps = len(compartments)
 
-        self.w_comps = 0
-        self.e_comps = 0
-        self.bm = self.n_comps
+        self.w_comps = 0 # w_comp can be read as "capability to excrete waste"
+        self.e_comps = 0 # e_comp can be read as "capability to extract energy"
+        self.basal_metabolsim = self.n_comps # how much energy is used by the system per time step
         for comp in compartments:
             if comp == "w_comp":
                 self.w_comps += 1
@@ -48,9 +56,9 @@ class BodySimpleMode():
         self.f = 0.0
         self.i = False
         
-        # modulatory vars
-        self.fW = 0.5
-        self.fE = 0.5
+        # modulatory vars 
+        self.fW = 0.5 # affects efficiency of waste excretion
+        self.fE = 0.5 # affects efficiency of energy extraction
 
 
     def time_step(self, action):
@@ -89,11 +97,13 @@ class BodySimpleMode():
 
     def Wi_Ei(self):
         """Applies additive operations to system variables
-        \n Wi : waste in
-        \n Ei : energy in"""
+        \n conditions : do if "mouth" is open (i=True) and nutrient is available
+        \n * Wi : waste in ; Ei : energy in
+        \n Waste in = waste contained in nutrient
+        \n Energy in = energy in nutrient * waste penalty * regulated activity (f)"""
         if self.i and self.N != None:
             add_E_lv = self.N[0]
-            self.E += (add_E_lv * self.Pw * self.f)
+            self.E += (add_E_lv * self.Pw * self.f) # * self.e_comps
             self.W += self.N[1] * self.f
             self.N = None
     
@@ -102,12 +112,15 @@ class BodySimpleMode():
         """Applies subtractive operations to system variables
         \n Wo : waste out
         \n Eo : energy out"""
-        if self.W > 3:
-            self.W -= (self.w_comps * (self.fW))
-        self.E -= self.bm # pay cost of basal metabolism
+        if self.W > self.fW: # so that waste doesn't go below zero
+            self.W -= ((self.fW)) # * self.w_comps
+        self.E -= self.basal_metabolsim # pay cost of basal metabolism
 
 
     def reset(self):
+        """resets the bodies variables, should be called by env's reset()\n
+        TODO: make stochastic option
+        """
         #print("RESETTING")
         self.E = 30
         self.W = 30
@@ -129,6 +142,7 @@ class BodySimpleMode():
         return np.array([self.E, self.W, next_E, next_W, self.f, self.i], dtype='float32')
 
     def display_status(self, sleeptime=0.1):
+        """Prints out some variables of the body in a pretty fashion"""
         E = round(self.E, 2)
         W = round(self.W, 2)
         Ne = round(self.N[0],2)
@@ -138,9 +152,9 @@ class BodySimpleMode():
         print(f"\rBody status | E: {E}  W: {W}  i: {i}  r: {f}  Ne: {Ne}  Nw: {Nw}",end='')
         sleep(sleeptime)
 
-    def info(self):
-        print(f"Body with {len(self.compartments)} compartments.")
-        i = 1
-        for comp in self.compartments:
-            print(f"\Compartment {i} info: {comp.ret_info()}")
-            i+=1
+    # def info(self):
+    #     print(f"Body with {len(self.compartments)} compartments.")
+    #     i = 1
+    #     for comp in self.compartments:
+    #         print(f"\Compartment {i} info: {comp.ret_info()}")
+    #         i+=1
