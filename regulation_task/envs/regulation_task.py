@@ -24,8 +24,7 @@ class RegulationTask(Env):
         self.stepno = 0
         self.verbose = verbose
 
-        self.collecting = False   # --------------||
-        print(self.collecting)
+        self.collecting = False   # --------------|| Data pipeline
         
         
 
@@ -39,8 +38,6 @@ class RegulationTask(Env):
             reward = 1
             done = False
         else:
-            # if self.collecting:
-            #     self.end_data_collection()
             reward = 0
             done = True
                
@@ -48,15 +45,17 @@ class RegulationTask(Env):
 
 
     def render(self):
-        if self.collecting == False:
-            self.start_data_colection()  # --------------||
-        if self.collecting:
-            self.register_timestep()  
+        if self.collecting == False:      # --------------|| Data pipeline  
+            self.start_data_colection()  
+        else:
+            self.register_timestep()
+
+        # Pygame Render?
 
 
     def reset(self):
         if self.collecting:
-            self.end_data_collection() # --------------||
+            self.end_data_collection() # --------------|| Data pipeline
         self.body.reset()
         self.alive = True
         obs = self.body.get_obs()
@@ -75,7 +74,7 @@ class RegulationTask(Env):
         self.pw_list = []
 
 
-    def register_timestep(self):
+    def register_timestep(self, verbose=False):
         LINE_UP = '\033[1A'
         LINE_CLEAR = '\x1b[2K'
 
@@ -92,12 +91,13 @@ class RegulationTask(Env):
         self.f_list.append(f)
         self.i_list.append(i)
         self.pw_list.append(pw)
-        
-        print(f"E: {e}   W: {w}  N: {n}")
-        print(f"i: {i}   f: {f}  pw: {pw}")
-        print(LINE_UP, end=LINE_CLEAR)
-        print(LINE_UP, end=LINE_CLEAR)
-        #sleep(0.1)
+
+        if verbose:
+            print(f"E: {e}   W: {w}  N: {n}")
+            print(f"i: {i}   f: {f}  pw: {pw}")
+            print(LINE_UP, end=LINE_CLEAR)
+            print(LINE_UP, end=LINE_CLEAR)
+            sleep(0.1)
 
 
     def end_data_collection(self):  # --------------||
