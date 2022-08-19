@@ -25,6 +25,7 @@ class RegulationTask(Env):
         self.verbose = verbose
 
         self.collecting = False   # --------------||
+        print(self.collecting)
         
         
 
@@ -38,17 +39,43 @@ class RegulationTask(Env):
             reward = 1
             done = False
         else:
+            # if self.collecting:
+            #     self.end_data_collection()
             reward = 0
             done = True
                
-
         return observation, reward, done, info
 
 
     def render(self):
         if self.collecting == False:
             self.start_data_colection()  # --------------||
+        if self.collecting:
+            self.register_timestep()  
 
+
+    def reset(self):
+        if self.collecting:
+            self.end_data_collection() # --------------||
+        self.body.reset()
+        self.alive = True
+        obs = self.body.get_obs()
+        return obs
+
+
+# below methods are for managing and visualising data
+
+    def start_data_colection(self):  # --------------||
+        self.collecting = True
+        self.e_list = []
+        self.w_list = []
+        self.n_list = []
+        self.f_list = []
+        self.i_list = []
+        self.pw_list = []
+
+
+    def register_timestep(self):
         LINE_UP = '\033[1A'
         LINE_CLEAR = '\x1b[2K'
 
@@ -70,27 +97,8 @@ class RegulationTask(Env):
         print(f"i: {i}   f: {f}  pw: {pw}")
         print(LINE_UP, end=LINE_CLEAR)
         print(LINE_UP, end=LINE_CLEAR)
-        
-        
-        #sleep(0.0001)
+        #sleep(0.1)
 
-
-    def reset(self):
-        if self.collecting:
-            self.end_data_collection() # --------------||
-        self.body.reset()
-        self.alive = True
-        obs = self.body.get_obs()
-        return obs
-
-    def start_data_colection(self):  # --------------||
-        self.collecting = True
-        self.e_list = []
-        self.w_list = []
-        self.n_list = []
-        self.f_list = []
-        self.i_list = []
-        self.pw_list = []
 
     def end_data_collection(self):  # --------------||
         # save run as numpy array
