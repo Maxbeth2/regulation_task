@@ -1,4 +1,6 @@
-# regulation_task
+# Regulation Task
+
+<img src="Flowchart.png">
  
 ## installation
 
@@ -8,6 +10,7 @@
 
 3. run command
    ```pip install -e .```
+
 
 
 ## Use
