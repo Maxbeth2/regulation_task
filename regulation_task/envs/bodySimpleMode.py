@@ -1,3 +1,4 @@
+from time import sleep
 from regulation_task.envs.util_funcs.funcs import sigmoid_thr
 import numpy as np
 # compartmentalisation enables isolation of chemical reactions
@@ -108,8 +109,8 @@ class BodySimpleMode():
 
     def reset(self):
         #print("RESETTING")
-        self.E = 40
-        self.W = 40
+        self.E = 30
+        self.W = 30
         self.N = None
         self.f = 0
         self.i = False
@@ -127,6 +128,15 @@ class BodySimpleMode():
 
         return np.array([self.E, self.W, next_E, next_W, self.f, self.i], dtype='float32')
 
+    def display_status(self, sleeptime=0.1):
+        E = round(self.E, 2)
+        W = round(self.W, 2)
+        Ne = round(self.N[0],2)
+        Nw = round(self.N[1],2)
+        i = self.i
+        f = round(self.f,2)
+        print(f"\rBody status | E: {E}  W: {W}  i: {i}  r: {f}  Ne: {Ne}  Nw: {Nw}",end='')
+        sleep(sleeptime)
 
     def info(self):
         print(f"Body with {len(self.compartments)} compartments.")

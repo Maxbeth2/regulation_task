@@ -24,10 +24,10 @@ class NutrientStream():
         noise_amplitude = 0
         noise = randint(-2,noise_amplitude)
         amplitude = 8
-        offset = 7
+        offset = 8
         self.val = max(amplitude * sin(self.t) + offset, 0)
         waste_val = max(4 * sin(self.t+0.5) + 3, 0)
         
-        return (self.val, 4.8)
+        return (self.val, 4)
         
     

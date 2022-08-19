@@ -13,7 +13,7 @@ from regulation_task.envs.nutrientStream import NutrientStream
 class RegulationTask(Env):
     def __init__(self, compartments=["w_comp","e_comp"], verbose=True):
         # Action space : [df, i]
-        self.action_space = Box(low=np.array([-1, -1]), high=np.array([1, 1]), dtype=np.int8)
+        self.action_space = Box(low=np.array([-1, -1]), high=np.array([1, 1]))
 
         # Observation space : [E, T, E_Nt, T_Nt, f] 
         self.observation_space = Box(low=np.array([0, 0, 0, 0, -0.5, 0]), high=np.array([100, 100, 30, 30, 0.5, 1]), shape=(6,) )
@@ -35,7 +35,7 @@ class RegulationTask(Env):
             self.alive = False
         info={}
         if self.alive == True:
-            reward = self.body.E
+            reward = 1
             done = False
         else:
             reward = 0

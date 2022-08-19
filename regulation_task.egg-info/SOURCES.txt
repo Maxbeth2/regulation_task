@@ -1,3 +1,4 @@
+README.md
 setup.py
 regulation_task/__init__.py
 regulation_task.egg-info/PKG-INFO
@@ -6,7 +7,7 @@ regulation_task.egg-info/dependency_links.txt
 regulation_task.egg-info/requires.txt
 regulation_task.egg-info/top_level.txt
 regulation_task/envs/__init__.py
-regulation_task/envs/body_simple.py
-regulation_task/envs/environment.py
+regulation_task/envs/bodySimpleMode.py
+regulation_task/envs/nutrientStream.py
 regulation_task/envs/regulation_task.py
 regulation_task/envs/util_funcs/funcs.py
