@@ -1,6 +1,6 @@
 # Regulation Task
 
-<img src="Flowchart.png">
+<img src="images/Flowchart.png">
  
 ## installation
 
