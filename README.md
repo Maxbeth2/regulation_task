@@ -1,5 +1,5 @@
 # Regulation Task
-
+For investigating the relationship between physiological regulatory processes and cognition
 <img src="images/Flowchart.png">
  
 ## installation
