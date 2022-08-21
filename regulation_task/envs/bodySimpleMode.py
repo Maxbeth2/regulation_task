@@ -24,7 +24,7 @@ class BodySimpleMode():
     \n * The process repeats, with new nutrients arriving and the agent deciding whether to consume them and how to process them while maintaining its system variables (E and W)
     \n * The gym env checks the body's E variable and sets done = True if it goes under a threshold (1)
     """
-    def __init__(self, compartments=["w_comp","e_comp"], food_stream=None):
+    def __init__(self, compartments=["w_comp","e_comp"], nutrient_stream=None):
 
        # SETUP ->
        
@@ -42,23 +42,35 @@ class BodySimpleMode():
                 self.e_comps += 1
 
         # the nutrient generating process
-        self.food_stream = food_stream
+        self.nutrient_stream = nutrient_stream
+        """calling the time_step() of nutrient_stream returns a nutrient"""
 
         # buffer "curve shape" constants
         self.thr_k1 = -0.5
+        """sets 'slope' of threshold"""
         self.thr_k2 = 70
+        """midpoint of threshold (where waste penalty is 0.5)"""
         
         # sensed-only vars -------------
-        self.N = (0,0) # sense limited no of elements, perhaps stochastically drawn
+        self.N = (0,0)
+        """The nutrient the agent is currently considering \n\n ## Sensed"""
         self.W = 0.0
+        """Current level of waste in body \n\n ## Sensed"""
         self.E = 0.0
+        """Current level of energy stored in body \n\n ## Sensed"""
         # Sensed and Actuated vars ------------
         self.f = 0.0
+        """parameter that decides the proportion of energy going to each 'bodily function', controlling their effetiveness. \n\n ## Sensed \n\n ## Actuated"""
         self.i = False
+        """bool that if true means the agent will take the currently considered nutrient into the system and process it. \n\n ## Sensed \n\n ## Actuated"""
         
         # modulatory vars 
         self.fW = 0.5 # affects efficiency of waste excretion
+        """the amount of waste excreted from the body in a timestep is multiplied by this variable"""
         self.fE = 0.5 # affects efficiency of energy extraction
+        """the amount of energy extracted from a nutrient is multiplied by this variable"""
+        self.Pw = 1
+        """a function of W, thr_k1, and thr_k2. The amount of energy extracted from a nutrient is multiplied by this variable """
 
 
     def time_step(self, action):
@@ -86,13 +98,13 @@ class BodySimpleMode():
         # Execute Wo and Eo
         self.Wo_Eo()
 
-        # get next food for next observation / action
-        next_food = self.food_stream.time_step()
-        self.N = next_food
+        # get next nutrient for next observation / action
+        next_nutrient = self.nutrient_stream.time_step()
+        self.N = next_nutrient
 
         # get observation to act on in next time step
-        sys_vars = self.get_obs(next_food)
-        return sys_vars
+        observation = self.get_obs(next_nutrient)
+        return observation
 
 
     def Wi_Ei(self):
@@ -127,14 +139,14 @@ class BodySimpleMode():
         self.N = None
         self.f = 0
         self.i = False
-        self.food_stream.t = 0
+        self.nutrient_stream.t = 0
 
 
-    def get_obs(self, next_food=None):
+    def get_obs(self, next_nutrient=None):
         """ returns a np array containing the observation of the current state"""
-        if next_food != None:
-            next_E = next_food[0]
-            next_W = next_food[1]
+        if next_nutrient != None:
+            next_E = next_nutrient[0]
+            next_W = next_nutrient[1]
         else:
             next_E = 0
             next_W = 0
