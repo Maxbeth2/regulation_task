@@ -2,8 +2,29 @@
 A minimalist approach to investigating the relationship between physiological regulatory processes and cognition
 --
 <img src="images/Flowchart.png">
- 
-## installation
+
+### Fig.1: The internal regulator
+From bottom to top:
+* A 'stream' of nutrients is flowing past the body of the agent. $[Nt-1, Nt, Nt+2,...]$
+* The agent observes the energy and waste contents in the stream at timestep $t$: $( WNt, ENt )$ and 
+* has to decide whether or not to allow this nutrient to enter its body. ( $i$ )
+* Once in the body, the nutrient is processed, releasing both the energy ( $Ei$ ) and waste products ( $Wi$ ) into the body. The amount of energy ( Ei ) extracted is modulated by three factors: 
+  * the amount of energy originally present in nutrient: $(ENt)$
+  * The amount of waste present in the body: $Pw(W)$
+  * how much energy the system allocates to "digestion": $fE(f)$
+    * As follows: $Ei = ENt * Pw * fE$
+* The amount of waste added is equal to ( $WNt$ )
+* Then waste is removed from the body ( $Wo$ ):  $W --> W-fW(f)$
+* Energy is also "spent" at a constant rate ( $Eo$ ): $E --> E- bm$, where bm stands for "basal metabolism" 
+
+---
+* $f$ is an actuated variable, as is $i$
+  * $f$ controls the proportion of energy directed to the $Ei$ and $Wo$ processes, where a low $f$ value means high waste excretion and a high $f$ value means efficient energy extraction.
+  * $i$ controls whether or not a nutrient enters the body
+* the sensed variables a given timestep are by default: $WNt, ENt, W, E, f, i$
+
+---
+## Installation
 
 1. In terminal, navigate to root of repository (folder containing setup.py)
 
