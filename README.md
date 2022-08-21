@@ -25,7 +25,15 @@ From bottom to top:
   * $i$ controls whether or not a nutrient enters the body
 * the sensed variables a given timestep are by default: $WNt, ENt, W, E, f, i$
 
+### Fig.2 Figure depicting 1000 steps of a sucessful agent's performance
+<img src="images/3_hidden.png">
+The environment of this agent is very controlled and noise-free, so these results are preliminary and not necessarily representative of what the environment is meant to do. The neural network controlling this agent has 3 hidden nodes and was evolved using evorobotpy2.
+
+[evorobotpy2](https://github.com/snolfi/evorobotpy2)
+
 ---
+...
+
 ## Installation
 
 1. In terminal, navigate to root of repository (folder containing setup.py)
