@@ -1,5 +1,7 @@
 # Regulation Task
-A minimalist approach to investigating the relationship between physiological regulatory processes and cognition
+## A minimalist approach to investigating the relationship between physiological regulatory processes and cognition
+
+[Video of agent performing task](https://www.youtube.com/watch?v=-LgDBbVABHQ)
 --
 <img src="images/Flowchart.png">
 
