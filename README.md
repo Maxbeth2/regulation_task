@@ -19,7 +19,8 @@ From bottom to top:
 * Then waste is removed from the body $(Wo)$:  $W --> W-fW(f)$
 * Energy is also "spent" at a constant rate $(Eo)$: $E --> E- bm$, where bm stands for "basal metabolism" 
 
----
+### What does the agent DO?
+The agent observes the state of its body, as well as the nutrients accessible to it, then decides whether or not to eat, and if it should focus on digesting or excreting waste.
 * $f$ is an actuated variable, as is $i$
   * $f$ controls the proportion of energy directed to the $Ei$ and $Wo$ processes, where a low $f$ value means high waste excretion and a high $f$ value means efficient energy extraction.
   * $i$ controls whether or not a nutrient enters the body
