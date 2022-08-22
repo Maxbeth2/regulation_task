@@ -9,37 +9,52 @@ import numpy as np
 
 from regulation_task.envs.bodySimpleMode import BodySimpleMode as Body
 from regulation_task.envs.nutrientStream import NutrientStream
+from regulation_task.envs.util_funcs.funcs import keramati_gutkin_reward
 
 class RegulationTask(Env):
-    def __init__(self, compartments=["w_comp","e_comp"], verbose=True):
+    """### Reward functions: 
+    \n 'cumulativeE', 
+    \n 'keramati_gutkin' """
+    def __init__(self, reward_func="default"):
         # Action space : [df, i]
         self.action_space = Box(low=np.array([-1, -1]), high=np.array([1, 1]))
 
         # Observation space : [E, T, E_Nt, T_Nt, f] 
         self.observation_space = Box(low=np.array([0, 0, 0, 0, -0.5, 0]), high=np.array([100, 100, 30, 30, 0.5, 1]), shape=(6,) )
         
-        compartments = compartments
-        self.body = Body(compartments, food_stream=NutrientStream())
+        self.body = Body(nutrient_stream=NutrientStream())
         self.alive = True
         self.stepno = 0
-        self.verbose = verbose
 
         self.collecting = False   # --------------|| Data pipeline
+        self.reward_func = reward_func
+        print(f"using reward function: {self.reward_func}")
         
         
 
     def step(self, action):
         self.stepno += 1
+        # keep track of deltaE for keramati gutkin rf
+        prevE = self.body.E
         observation = self.body.time_step(action)
+        currE = self.body.E
+
         if observation[0] < 1:
             self.alive = False
         info={}
-        if self.alive == True:
-            reward = 1
-            done = False
-        else:
+        if self.alive != True:
             reward = 0
             done = True
+            return observation, reward, done, info
+
+        if self.reward_func == "cumulativeE":
+            reward = currE
+        elif self.reward_func == "keramati_gutkin":
+            deltaE = currE - deltaE
+            reward=keramati_gutkin_reward(deltaE)
+        elif self.reward_func == "default":
+            reward = 1
+        done = False        
                
         return observation, reward, done, info
 
