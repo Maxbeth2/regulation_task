@@ -1,8 +1,10 @@
 # Regulation Task
 ## A minimalist approach to investigating the relationship between physiological regulatory processes and cognition
 
-[Video of agent performing task](https://www.youtube.com/watch?v=-LgDBbVABHQ)
---
+>### [--Thesis google doc--](https://docs.google.com/document/d/1PajZf6r1QQUTJS9LNHCGfRXgicV37BbU3PBe8qx3AB0/edit#)
+
+>### [Video of agent performing task](https://www.youtube.com/watch?v=-LgDBbVABHQ)
+
 <img src="images/Flowchart.png">
 
 ### Fig.1: The internal regulator
