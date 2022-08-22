@@ -12,10 +12,7 @@ from regulation_task.envs.nutrientStream import NutrientStream
 from regulation_task.envs.util_funcs.funcs import keramati_gutkin_reward
 
 class RegulationTask(Env):
-    """### Reward functions: 
-    \n 'cumulativeE', 
-    \n 'keramati_gutkin' """
-    def __init__(self, reward_func="default"):
+    def __init__(self):
         # Action space : [df, i]
         self.action_space = Box(low=np.array([-1, -1]), high=np.array([1, 1]))
 
@@ -27,9 +24,9 @@ class RegulationTask(Env):
         self.stepno = 0
 
         self.collecting = False   # --------------|| Data pipeline
-        self.reward_func = reward_func
-        print(f"using reward function: {self.reward_func}")
-        
+        self.reward_funcs = ["default", "cumulativeE", "keramati_gutkin"]
+        self.reward_function = "default"
+        print(f"\nUsing reward function: {self.reward_function}. run env.set_rf() for options..\n")
         
 
     def step(self, action):
@@ -47,12 +44,12 @@ class RegulationTask(Env):
             done = True
             return observation, reward, done, info
 
-        if self.reward_func == "cumulativeE":
+        if self.reward_function == "cumulativeE":
             reward = currE
-        elif self.reward_func == "keramati_gutkin":
-            deltaE = currE - deltaE
+        elif self.reward_function == "keramati_gutkin":
+            deltaE = currE - prevE
             reward=keramati_gutkin_reward(deltaE)
-        elif self.reward_func == "default":
+        elif self.reward_function == "default":
             reward = 1
         done = False        
                
@@ -76,6 +73,14 @@ class RegulationTask(Env):
         obs = self.body.get_obs()
         return obs
 
+    def set_rf(self):
+        print("available reward funcs:\n")
+        for rf in self.reward_funcs:
+            print(rf)
+        rew_f = str.strip(input("Enter desired reward function: "))
+        if rew_f in self.reward_funcs:
+            self.reward_function = rew_f
+            print(f"\nSet reward function to {rew_f}!\n")
 
 # below methods are for managing and visualising data
 
