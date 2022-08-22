@@ -6,18 +6,18 @@
 <img src="images/Flowchart.png">
 
 ### Fig.1: The internal regulator
-From bottom to top:
-* A 'stream' of nutrients is flowing past the body of the agent. $[Nt-1, Nt, Nt+2,...]$
-* The agent observes (among other things) the energy and waste contents in the stream at timestep $t$: $( WNt, ENt )$ and 
-* has to decide whether or not to allow this nutrient to enter its body. ( $i$ )
-* Once in the body, the nutrient is processed, releasing both the energy ( $Ei$ ) and waste products ( $Wi$ ) into the body. The amount of energy ( Ei ) extracted is modulated by three factors: 
-  * the amount of energy originally present in nutrient: $(ENt)$
-  * The amount of waste present in the body: $Pw(W)$
-  * how much energy the system allocates to "digestion": $fE(f)$
-    * As follows: $Ei = ENt * Pw * fE$
-* The amount of waste added is equal to ( $WNt$ )
-* Then waste is removed from the body $(Wo)$:  $W --> W-fW(f)$
-* Energy is also "spent" at a constant rate $(Eo)$: $E --> E- bm$, where bm stands for "basal metabolism" 
+>From bottom to top:
+>* A 'stream' of nutrients is flowing past the body of the >agent. $[Nt-1, Nt, Nt+2,...]$
+>* The agent observes (among other things) the energy and waste contents in the stream at timestep $t$: $( WNt, ENt )$ and 
+>* has to decide whether or not to allow this nutrient to enter its body. ( $i$ )
+>* Once in the body, the nutrient is processed, releasing both the energy ( $Ei$ ) and waste products ( $Wi$ ) into the body. The amount of energy ( Ei ) extracted is modulated by three factors: 
+>>  * the amount of energy originally present in nutrient: $(ENt)$
+>>  * The amount of waste present in the body: $Pw(W)$
+>>  * how much energy the system allocates to "digestion": $fE(f)$
+> >>   * As follows: $Ei = ENt * Pw * fE$
+>* The amount of waste added is equal to ( $WNt$ )
+>* Then waste is removed from the body $(Wo)$:  $W --> W-fW(f)$
+>* Energy is also "spent" at a constant rate $(Eo)$: $E --> E- bm$, where bm stands for "basal metabolism" 
 
 ### What does the agent DO?
 The agent observes the state of its body, as well as the nutrients accessible to it, then decides whether or not to eat, and if it should focus on digesting or excreting waste.
