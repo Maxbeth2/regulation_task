@@ -61,7 +61,7 @@ env = gym.make("RegulationTask-v0")
 and there you have your environment.
 
 
-## Adapt to RL
+## Change Reward Function
 
 Currently, the reward function in the environment is adapted to evolutionary algorithms, giving a reward of 1 for each timestep that the agent is alive.
 You can go to 'regulation_task.py' and change the reward function (located in the step method of RegulationTask)
