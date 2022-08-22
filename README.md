@@ -65,35 +65,21 @@ and there you have your environment.
 
 ## Change Reward Function
 
-Currently, the reward function in the environment is adapted to evolutionary algorithms, giving a reward of 1 for each timestep that the agent is alive.
-You can go to 'regulation_task.py' and change the reward function (located in the step method of RegulationTask)
-One possible reward function can be implemented by accessing the energy level of the agent.
-
-
-#### Reward based on staying alive
+depending on what training strategy you are using, you will want to use different reward functions.
+``` 
+reward_function = "default"     
+# 1 reward for each timestep spent alive
 ```
-# within step method of regulation_task.py
-
-if self.alive == True:
-            reward = 1       # <-- where reward is set
-            done = False
-        else:
-            reward = 0
-            done = True
 ```
-#### Reward based on energy level
+reward_function = "cumulativeE"     
+# reward is equal to the current "satiety" of the agent
 ```
-# within step method of regulation_task.py
-
-if self.alive == True:
-            reward = self.body.E      # <-- get energy varialbe level of agent
-            done = False
-        else:
-            reward = 0
-            done = True
+```
+reward_function = "keramati_gutkin"   
+# reward is equal to the squared gain of energy, can be negative (loss of energy)
+```
+```
+env.set_rf(reward_function)
 ```
 
-
-
-now the agent is rewarded according to how 'satiated' it is at each time step
-
+'default' and 'cumulativeE' works for evolutionary strategies, 'keramati_gutkin' is an experimental implementaion/inspiration of the homeostatic reward function as described in [Keramati and Gutkin (2014)](https://elifesciences.org/articles/04811).

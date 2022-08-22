@@ -73,11 +73,12 @@ class RegulationTask(Env):
         obs = self.body.get_obs()
         return obs
 
-    def set_rf(self):
-        print("available reward funcs:\n")
-        for rf in self.reward_funcs:
-            print(rf)
-        rew_f = str.strip(input("Enter desired reward function: "))
+    def set_rf(self, rew_f=None):
+        if rew_f == None:
+            print("available reward funcs:\n")
+            for rf in self.reward_funcs:
+                print(rf)
+            rew_f = str.strip(input("Enter desired reward function: "))
         if rew_f in self.reward_funcs:
             self.reward_function = rew_f
             print(f"\nSet reward function to {rew_f}!\n")
