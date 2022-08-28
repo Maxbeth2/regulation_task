@@ -1,7 +1,7 @@
 
 
 from math import sin
-from random import randint
+from random import randint, random, randrange
 
 class NutrientStream():
     """
@@ -13,14 +13,19 @@ class NutrientStream():
     def __init__(self, dt=0.1):
         self.t = 0.0
         self.dt = dt
+
+        self.amplitude = 8
+        self.offset = 7
+        self.noise_amplitude = 0
+        self.noise_offset = 0
     
     def time_step(self):
         self.t += self.dt
-        noise_amplitude = 0
-        noise = randint(-2,noise_amplitude)
-        amplitude = 8
-        offset = 8
-        self.val = max(amplitude * sin(self.t) + offset, 0)
+        
+        noise = ((random() - 0.5) * 2 * self.noise_amplitude) + self.noise_offset
+        offset = self.offset
+        self.val = max(self.amplitude * sin(self.t) + offset + noise, 0)
+        
         waste_val = max(4 * sin(self.t+0.5) + 3, 0)
         
         return (self.val, 4)

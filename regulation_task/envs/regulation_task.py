@@ -1,3 +1,4 @@
+from random import randint, random
 from time import sleep
 from gym import Env
 from gym.spaces.box import Box
@@ -71,6 +72,10 @@ class RegulationTask(Env):
         self.body.reset()
         self.alive = True
         obs = self.body.get_obs()
+
+        noise_amp = random() * 2
+        noise_off = randint(-2,2)
+        self.climate_change(noise_amp=noise_amp, noise_off=noise_off)
         return obs
 
     def set_rf(self, rew_f=None):
@@ -249,3 +254,10 @@ class RegulationTask(Env):
 
         return skip
 
+
+    def climate_change(self, amp=8, off=7, noise_amp=0, noise_off=0):
+        ns = self.body.nutrient_stream
+        ns.amplitude = amp
+        ns.offset = off
+        ns.noise_amplitude = noise_amp
+        ns.noise_offset = noise_off

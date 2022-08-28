@@ -1,4 +1,5 @@
 from time import sleep
+from regulation_task.envs.nutrientStream import NutrientStream
 from regulation_task.envs.util_funcs.funcs import sigmoid_thr
 import numpy as np
 # compartmentalisation enables isolation of chemical reactions
@@ -24,7 +25,7 @@ class BodySimpleMode():
     \n * The process repeats, with new nutrients arriving and the agent deciding whether to consume them and how to process them while maintaining its system variables (E and W)
     \n * The gym env checks the body's E variable and sets done = True if it goes under a threshold (1)
     """
-    def __init__(self, compartments=["w_comp","e_comp"], nutrient_stream=None):
+    def __init__(self, compartments=["w_comp","e_comp"], nutrient_stream=NutrientStream()):
 
        # SETUP ->
        
