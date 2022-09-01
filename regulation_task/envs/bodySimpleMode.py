@@ -1,3 +1,4 @@
+from random import randint
 from time import sleep
 from regulation_task.envs.nutrientStream import NutrientStream
 from regulation_task.envs.util_funcs.funcs import sigmoid_thr
@@ -28,14 +29,16 @@ class BodySimpleMode():
     def __init__(self, compartments=["w_comp","e_comp"], nutrient_stream=NutrientStream()):
 
        # SETUP ->
-       
+        self.sense_internal_vars = True
+        self.sense_external = True
+        self.sense_actuatory_states = True
        # list of compartments within system - overcomplicated way of specifying that the system can extract energy and excrete waste
         self.compartments = compartments
-        self.n_comps = len(compartments)
 
         self.w_comps = 0 # w_comp can be read as "capability to excrete waste"
         self.e_comps = 0 # e_comp can be read as "capability to extract energy"
-        self.basal_metabolsim = self.n_comps # how much energy is used by the system per time step
+        self.basal_metabolsim = 1.2 # how much energy is used by the system per time step
+        self.waste_clear_rate = 1
         for comp in compartments:
             if comp == "w_comp":
                 self.w_comps += 1
@@ -49,14 +52,16 @@ class BodySimpleMode():
         # buffer "curve shape" constants
         self.thr_k1 = -0.5
         """sets 'slope' of threshold"""
-        self.thr_k2 = 70
+        self.thr_k2 = 50
         """midpoint of threshold (where waste penalty is 0.5)"""
         
         # sensed-only vars -------------
         self.N = (0,0)
         """The nutrient the agent is currently considering \n\n ## Sensed"""
+        self.maxW = 120
         self.W = 0.0
         """Current level of waste in body \n\n ## Sensed"""
+        self.maxE = 120
         self.E = 0.0
         """Current level of energy stored in body \n\n ## Sensed"""
         # Sensed and Actuated vars ------------
@@ -85,9 +90,12 @@ class BodySimpleMode():
         self.i = False
         if action[0] > 0: # gym action
             self.i = True
-    
-        self.f += (action[1])/50      # gym action
-        self.f = min(0.5,(max(-0.5, self.f)))
+
+        try:
+            self.f += (action[1])/50      # gym action
+            self.f = min(0.5,(max(-0.5, self.f)))
+        except:
+            self.f = 0.0
         
         # calculate modulators
         self.fW = 0.5 - self.f
@@ -100,11 +108,10 @@ class BodySimpleMode():
         self.Wo_Eo()
 
         # get next nutrient for next observation / action
-        next_nutrient = self.nutrient_stream.time_step()
-        self.N = next_nutrient
+        self.N = self.nutrient_stream.time_step()
 
         # get observation to act on in next time step
-        observation = self.get_obs(next_nutrient)
+        observation = self.get_obs()
         return observation
 
 
@@ -116,8 +123,9 @@ class BodySimpleMode():
         \n Energy in = energy in nutrient * waste penalty * regulated activity (f)"""
         if self.i and self.N != None:
             add_E_lv = self.N[0]
-            self.E += (add_E_lv * self.Pw * self.f) # * self.e_comps
-            self.W += self.N[1] * self.f
+            self.E += (add_E_lv * self.Pw * self.fE) # * self.e_comps
+            self.E = min(self.E, self.maxE)
+            self.W += self.N[1]
             self.N = None
     
 
@@ -125,8 +133,9 @@ class BodySimpleMode():
         """Applies subtractive operations to system variables
         \n Wo : waste out
         \n Eo : energy out"""
-        if self.W > self.fW: # so that waste doesn't go below zero
-            self.W -= ((self.fW)) # * self.w_comps
+        
+        self.W -= (self.waste_clear_rate * self.fW) # * self.w_comps
+        self.W = max(0, self.W)
         self.E -= self.basal_metabolsim # pay cost of basal metabolism
 
 
@@ -135,24 +144,27 @@ class BodySimpleMode():
         TODO: make stochastic option
         """
         #print("RESETTING")
-        self.E = 30
-        self.W = 30
+        self.E = 30 #+ randint(-5,5)
+        self.W = 30 #+ randint(-5,5)
         self.N = None
         self.f = 0
         self.i = False
         self.nutrient_stream.t = 0
 
 
-    def get_obs(self, next_nutrient=None):
+    def get_obs(self):
         """ returns a np array containing the observation of the current state"""
-        if next_nutrient != None:
-            next_E = next_nutrient[0]
-            next_W = next_nutrient[1]
-        else:
-            next_E = 0
-            next_W = 0
+        next_E = 0
+        next_W = 0
+        if self.N != None:
+            next_E = self.N[0]
+            next_W = self.N[1]
+        max_Ent = self.nutrient_stream.amplitude + self.nutrient_stream.offset + self.nutrient_stream.noise_amplitude
+        return np.array([self.E/self.maxE, self.W/self.maxW, next_E/max_Ent, 1, self.f, self.i], dtype='float32')
+        #return np.array([next_E/max_Ent], dtype='float32')
 
-        return np.array([self.E, self.W, next_E, next_W, self.f, self.i], dtype='float32')
+    def get_max_vals(self):
+        pass
 
     def display_status(self, sleeptime=0.1):
         """Prints out some variables of the body in a pretty fashion"""

@@ -14,19 +14,25 @@ from regulation_task.envs.util_funcs.funcs import keramati_gutkin_reward
 
 class RegulationTask(Env):
     def __init__(self):
-        # Action space : [df, i]
-        self.action_space = Box(low=np.array([-1, -1]), high=np.array([1, 1]))
-
-        # Observation space : [E, T, E_Nt, T_Nt, f] 
-        self.observation_space = Box(low=np.array([0, 0, 0, 0, -0.5, 0]), high=np.array([100, 100, 30, 30, 0.5, 1]), shape=(6,) )
-        
         self.body = Body(nutrient_stream=NutrientStream())
+        # Action space : [df, i]
+        #self.action_space = Box(low=np.array([-1, -1]), high=np.array([1, 1]))
+        self.action_space = Box(low = -1, high=1, shape=(2,))
+        #self.action_space = Box(low = -1, high=1, shape=(1,))
+
+        # Observation space : [E, T, E_Nt, W_Nt, f, i] 
+        # Observation space : [E_Nt, W_Nt] 
+        self.observation_space = Box(low=np.array([0, 0, 0, 0, -0.5, 0]), high=np.array([1, 1, 1, 1, 0.5, 1]), shape=(6,) )
+        #self.observation_space = Box(low=0, high=1, shape=(1,) )
+
+        
         self.alive = True
         self.stepno = 0
 
         self.collecting = False   # --------------|| Data pipeline
         self.reward_funcs = ["default", "cumulativeE", "keramati_gutkin"]
-        self.reward_function = "default"
+        self.reward_function = "cumulativeE"
+        self.vary_noise = False
         print(f"\nUsing reward function: {self.reward_function}. run env.set_rf() for options..\n")
         
 
@@ -37,7 +43,7 @@ class RegulationTask(Env):
         observation = self.body.time_step(action)
         currE = self.body.E
 
-        if observation[0] < 1:
+        if currE < 1:
             self.alive = False
         info={}
         if self.alive != True:
@@ -66,7 +72,8 @@ class RegulationTask(Env):
         # Pygame Render?
 
 
-    def reset(self):
+    def reset(self, seed=None, return_info=None, options=None):
+        self.seed = seed
         if self.collecting:
             self.end_data_collection() # --------------|| Data pipeline
         self.body.reset()
@@ -75,7 +82,8 @@ class RegulationTask(Env):
 
         noise_amp = random() * 2
         noise_off = randint(-2,2)
-        self.climate_change(noise_amp=noise_amp, noise_off=noise_off)
+        if self.vary_noise:
+            self.climate_change()
         return obs
 
     def set_rf(self, rew_f=None):
@@ -245,7 +253,7 @@ class RegulationTask(Env):
             skip = False
 
         if choice != '':
-            data = np.array( [self.e_list, self.w_list, self.f_list, self.i_list, self.pw_list] )
+            data = np.array( [self.e_list, self.w_list, self.n_list, self.f_list, self.i_list, self.pw_list] )
             choice = "lifecycles_data/" + choice
             np.save(choice, data, True)
 
@@ -255,9 +263,11 @@ class RegulationTask(Env):
         return skip
 
 
-    def climate_change(self, amp=8, off=7, noise_amp=0, noise_off=0):
+
+    def climate_change(self):
         ns = self.body.nutrient_stream
-        ns.amplitude = amp
-        ns.offset = off
-        ns.noise_amplitude = noise_amp
-        ns.noise_offset = noise_off
+        ns.noise_amplitude_gen = randint(-ns.noise_amplitude, ns.noise_amplitude)
+        ns.noise_offset_gen = randint(-ns.noise_offset, ns.noise_offset)
+
+        print(f"generation noise | amp: {ns.noise_amplitude_gen} / {ns.noise_amplitude}, offs: {ns.noise_offset_gen} / {ns.noise_offset}")
+    
