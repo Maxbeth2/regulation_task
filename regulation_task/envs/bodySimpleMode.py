@@ -65,15 +65,15 @@ class BodySimpleMode():
         self.E = 0.0
         """Current level of energy stored in body \n\n ## Sensed"""
         # Sensed and Actuated vars ------------
-        self.f = 0.0
+        self.r = 0.0
         """parameter that decides the proportion of energy going to each 'bodily function', controlling their effetiveness. \n\n ## Sensed \n\n ## Actuated"""
         self.i = False
         """bool that if true means the agent will take the currently considered nutrient into the system and process it. \n\n ## Sensed \n\n ## Actuated"""
         
         # modulatory vars 
-        self.fW = 0.5 # affects efficiency of waste excretion
+        self.rW = 0.5 # affects efficiency of waste excretion
         """the amount of waste excreted from the body in a timestep is multiplied by this variable"""
-        self.fE = 0.5 # affects efficiency of energy extraction
+        self.rE = 0.5 # affects efficiency of energy extraction
         """the amount of energy extracted from a nutrient is multiplied by this variable"""
         self.Pw = 1
         """a function of W, thr_k1, and thr_k2. The amount of energy extracted from a nutrient is multiplied by this variable """
@@ -92,14 +92,16 @@ class BodySimpleMode():
             self.i = True
 
         try:
-            self.f += (action[1])/50      # gym action
-            self.f = min(0.5,(max(-0.5, self.f)))
+            deltar = action[1]
+            deltar = min(0.1, max(-0.1, deltar))
+            self.r += deltar #(action[1])/50      # gym action
+            self.r = min(0.5,(max(-0.5, self.r)))
         except:
-            self.f = 0.0
+            self.r += 0.0
         
         # calculate modulators
-        self.fW = 0.5 - self.f
-        self.fE = 0.5 + self.f
+        self.rW = 0.5 - self.r
+        self.rE = 0.5 + self.r
         self.Pw = ( sigmoid_thr(self.thr_k1, self.thr_k2, self.W) ) # waste penalty
 
         # Execute Wi and Ei
@@ -123,7 +125,7 @@ class BodySimpleMode():
         \n Energy in = energy in nutrient * waste penalty * regulated activity (f)"""
         if self.i and self.N != None:
             add_E_lv = self.N[0]
-            self.E += (add_E_lv * self.Pw * self.fE) # * self.e_comps
+            self.E += (add_E_lv * self.Pw * self.rE) # * self.e_comps
             self.E = min(self.E, self.maxE)
             self.W += self.N[1]
             self.N = None
@@ -134,7 +136,7 @@ class BodySimpleMode():
         \n Wo : waste out
         \n Eo : energy out"""
         
-        self.W -= (self.waste_clear_rate * self.fW) # * self.w_comps
+        self.W -= (self.waste_clear_rate * self.rW) # * self.w_comps
         self.W = max(0, self.W)
         self.E -= self.basal_metabolsim # pay cost of basal metabolism
 
@@ -147,7 +149,7 @@ class BodySimpleMode():
         self.E = 30 #+ randint(-5,5)
         self.W = 30 #+ randint(-5,5)
         self.N = None
-        self.f = 0
+        self.r = 0
         self.i = False
         self.nutrient_stream.t = 0
 
@@ -160,8 +162,8 @@ class BodySimpleMode():
             next_E = self.N[0]
             next_W = self.N[1]
         max_Ent = self.nutrient_stream.amplitude + self.nutrient_stream.offset + self.nutrient_stream.noise_amplitude
-        return np.array([self.E/self.maxE, self.W/self.maxW, next_E/max_Ent, 1, self.f, self.i], dtype='float32')
-        #return np.array([next_E/max_Ent], dtype='float32')
+        #return np.array([self.E/self.maxE, self.W/self.maxW, next_E/max_Ent, 1, self.r, self.i], dtype='float32')
+        return np.array([next_E/max_Ent], dtype='float32')
 
     def get_max_vals(self):
         pass
@@ -173,8 +175,8 @@ class BodySimpleMode():
         Ne = round(self.N[0],2)
         Nw = round(self.N[1],2)
         i = self.i
-        f = round(self.f,2)
-        print(f"\rBody status | E: {E}  W: {W}  i: {i}  r: {f}  Ne: {Ne}  Nw: {Nw}",end='')
+        r = round(self.r,2)
+        print(f"\rBody status | E: {E}  W: {W}  i: {i}  r: {r}  Ne: {Ne}  Nw: {Nw}",end='')
         sleep(sleeptime)
 
     # def info(self):

@@ -22,8 +22,8 @@ class RegulationTask(Env):
 
         # Observation space : [E, T, E_Nt, W_Nt, f, i] 
         # Observation space : [E_Nt, W_Nt] 
-        self.observation_space = Box(low=np.array([0, 0, 0, 0, -0.5, 0]), high=np.array([1, 1, 1, 1, 0.5, 1]), shape=(6,) )
-        #self.observation_space = Box(low=0, high=1, shape=(1,) )
+        #self.observation_space = Box(low=np.array([0, 0, 0, 0, -0.5, 0]), high=np.array([1, 1, 1, 1, 0.5, 1]), shape=(6,) )
+        self.observation_space = Box(low=0, high=1, shape=(1,) )
 
         
         self.alive = True
@@ -103,7 +103,7 @@ class RegulationTask(Env):
         self.e_list = []
         self.w_list = []
         self.n_list = []
-        self.f_list = []
+        self.r_list = []
         self.i_list = []
         self.pw_list = []
 
@@ -115,14 +115,14 @@ class RegulationTask(Env):
         e = round(self.body.E,2)
         w = round(self.body.W,2)
         n = self.body.N
-        f = round(self.body.f, 3)
+        f = round(self.body.r, 3)
         i = self.body.i
         pw = round(1-self.body.Pw,2)
 
         self.e_list.append(e)  # --------------||
         self.w_list.append(w)
         self.n_list.append(n[0])
-        self.f_list.append(f)
+        self.r_list.append(f)
         self.i_list.append(i)
         self.pw_list.append(pw)
 
@@ -157,7 +157,7 @@ class RegulationTask(Env):
             plt.plot(t, self.n_list, label="Nutritional value")
             plt.legend()
             b = plt.subplot(212)
-            plt.plot(t, self.f_list, label="Flow")
+            plt.plot(t, self.r_list, label="Flow")
             plt.plot(t, self.i_list, label="Mouth open/closed")
             plt.plot(t, self.pw_list, label="Waste penalty")
             plt.legend()
@@ -173,7 +173,7 @@ class RegulationTask(Env):
         plt.plot(t, self.n_list, label="Nutritional value")
         plt.legend()
         b = plt.subplot(212)
-        plt.plot(t, self.f_list, label="Flow")
+        plt.plot(t, self.r_list, label="Flow")
         plt.plot(t, self.i_list, label="Mouth open/closed")
         plt.plot(t, self.pw_list, label="Waste penalty")
         plt.legend()
@@ -223,8 +223,8 @@ class RegulationTask(Env):
                 # waste department
                 pg.draw.circle(screen,(200,0,0), w_circle_pos, wcirc_sz)
                 # flow indicator
-                f_ind = self.f_list[t] * 40
-                end_p = (middle_w+f_ind, middle_h)
+                r_ind = self.r_list[t] * 40
+                end_p = (middle_w+r_ind, middle_h)
                 pg.draw.line(screen, red, anchor, end_p, 5)
                 # open/close mouth
                 if self.i_list[t] > 0.5:
@@ -253,7 +253,7 @@ class RegulationTask(Env):
             skip = False
 
         if choice != '':
-            data = np.array( [self.e_list, self.w_list, self.n_list, self.f_list, self.i_list, self.pw_list] )
+            data = np.array( [self.e_list, self.w_list, self.n_list, self.r_list, self.i_list, self.pw_list] )
             choice = "lifecycles_data/" + choice
             np.save(choice, data, True)
 
